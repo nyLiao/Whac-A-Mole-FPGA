@@ -1,8 +1,11 @@
 module wam_led (
-    input wire [7:0] sw,
-    output reg [3:0] ld
+    input wire clk,
+    input wire [7:0]  holes,
+    output wire [7:0] ld
     );
 
-    
+    integer i;
+
+    assign ld = holes;
 
 endmodule // wam_led
