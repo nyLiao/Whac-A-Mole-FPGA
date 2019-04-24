@@ -21,54 +21,64 @@ module wam_rdn(             // generate 8-bit random number
     end
 endmodule
 
-module wam_gen (            // control life of moles
-    input wire clk,
+module wam_gen (
+    input wire clk_19,
     input wire clr,
     input wire [32:0] clk_cnt,
+    input wire [7:0]  hit,
     output reg [7:0]  holes         // which hole has moles
     );
 
-    wire [7:0] clk_n;
-    wire [7:0] rnum1;
-    wire [7:0] rnum2;
-    reg  [31:0] holes_cnt;          // counter of roles, 3 bits for each hole
+    reg  [2:0] clk_22_cnt;          // clk_22 counter, 3 bits on 2^19
+    reg  [31:0] holes_cnt;          // counter of roles, 3 bits for each hole on 2^22
+    wire [7:0] rnum;                // random number
     reg  [2:0] j;                   // select holes in different rounds
     integer i;                      // index for holes in one round
 
-    assign clk_n = clk_cnt[29:22];      // new clock
-
     // make random number
-    wam_rdn rdn1( .clk(clk_cnt[21]), .load(clr), .seed(~clk_cnt[7:0]), .num(rnum1) );
-    // wam_rdn rdn2( .clk(clk), .clr(clr), .load(clk_cnt[30]), .seed(clk_cnt[7:0]), .num(rnum2) );
+    wam_rdn rdn1( .clk(clk_cnt[21]), .load(clr), .seed(~clk_cnt[7:0]), .num(rnum) );
 
-    always @ ( posedge clk_n[0] or posedge clr ) begin       // 1-phrase stage machine
+    // 1-phrase stage machine
+    always @ ( posedge clk_19 or posedge clr ) begin
         if (clr) begin
             holes <= 8'b0;
             holes_cnt <= 32'b0;
             j <= 0;
         end
         else begin
-            for (i=0; i<8; i=i+1) begin
-                if (holes[i] > 0) begin                         // already have mole
-                    if (holes_cnt[4*i+:4] < 4'b0111) begin      // count
-                        holes_cnt[4*i+:4] <= holes_cnt[4*i+:4] + 1;
-                    end
-                    else begin                                  // die
+            if (clk_22_cnt < 3'b111) begin
+                clk_22_cnt <= clk_22_cnt + 1;
+                for (i=0; i<8; i=i+1) begin
+                    if (hit[i]) begin
                         holes_cnt[4*i+:4] <= 4'b0000;
                         holes[i] <= 0;
                     end
                 end
-                else begin                                      // no mole yet
-                    if (rnum1 < 50) begin
-                        if (j==i) begin                         // new mole in hole j
-                            holes_cnt[4*i+:4] <= 4'b0001;
-                            holes[i] <= 1;
+            end
+            else begin
+                clk_22_cnt <= 3'b000;
+                for (i=0; i<8; i=i+1) begin
+                    if (holes[i] > 0) begin                         // already have mole
+                        if ((holes_cnt[4*i+:4] >= 4'b0111) || hit[i]) begin      // count
+                            holes_cnt[4*i+:4] <= 4'b0000;
+                            holes[i] <= 0;
+                        end
+                        else begin                                  // die
+                            holes_cnt[4*i+:4] <= holes_cnt[4*i+:4] + 1;
+                        end
+                    end
+                    else begin                                      // no mole yet
+                        if (rnum < 50) begin
+                            if (j==i) begin                         // new mole in hole j
+                                holes_cnt[4*i+:4] <= 4'b0001;
+                                holes[i] <= 1;
+                            end
                         end
                     end
                 end
+                j <= j + 1;
+                // holes <= rnum1;
             end
-            j <= j + 1;
-            // holes <= rnum1;
         end
     end
 endmodule // wam_gen

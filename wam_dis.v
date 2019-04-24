@@ -27,16 +27,21 @@ module wam_obd(             // 1-bit digital tube output
 endmodule
 
 module wam_dis(             // handle digital tube output
-    input wire [1:0] sbit,
+    input clk_16,
     input wire [11:0] score,
     output reg [3:0] an,
     output wire [6:0] a2g
     );
 
+    reg [1:0] clk_16_cnt;
     reg [3:0] dnum;
 
+    always @ (posedge clk_16) begin
+        clk_16_cnt <= clk_16_cnt + 1;
+    end
+
     always @(*) begin
-        case(sbit)
+        case(clk_16_cnt)    // choose which tube to display
             2'b00: begin
                 dnum = score[3:0];
                 an = 4'b1110;
