@@ -1,3 +1,11 @@
+module wam_led (            // led output
+    input wire [7:0]  holes,
+    output wire [7:0] ld
+    );
+
+    assign ld = holes;
+endmodule // wam_led
+
 module wam_obd(             // 1-bit digital tube output
     input wire [3:0] num,
     output reg [6:0] a2g
@@ -24,7 +32,7 @@ module wam_obd(             // 1-bit digital tube output
             default: a2g=7'b1111111;    // default is blank
         endcase
     end
-endmodule
+endmodule // wam_obd
 
 module wam_dis(             // handle digital tube output
     input clk_16,
@@ -61,4 +69,4 @@ module wam_dis(             // handle digital tube output
         endcase
     end
     wam_obd obd( .num(dnum), .a2g(a2g) );
-endmodule
+endmodule // wam_dis

@@ -19,9 +19,9 @@ module wam_rdn(             // generate 8-bit random number
             num[7] <= num[6];
         end
     end
-endmodule
+endmodule // wam_rdn
 
-module wam_gen (
+module wam_gen (            // control lives of moles
     input wire clk_19,
     input wire clr,
     input wire [32:0] clk_cnt,
