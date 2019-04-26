@@ -12,16 +12,21 @@ module wam_m(
     input wire clr,         // button - clear
     input wire lft,         // button - left
     input wire rgt,         // button - right
-    input wire pse,         // button - pause
+    // input wire pse,         // button - pause
     input wire [7:0] sw,    // switch
     output wire [3:0] an,   // digital tube - analog
     output wire [6:0] a2g,  // digital tube - stroke
     output wire [7:0] ld
     );
 
-    reg  [32:0] clk_cnt;    // clock count
+    reg  [31:0] clk_cnt;    // clock count
     wire clk_16;            // clock at 2^16
     wire clk_19;            // clock at 2^19
+
+    wire cout0;
+    wire [3:0] hrdn;        // hardness of 0~9
+    wire [3:0] age;
+    wire [7:0] rto;
 
     wire [7:0]  holes;      // 8 holes, each is a 4-bit counter
     wire [7:0]  tap;
@@ -35,7 +40,7 @@ module wam_m(
         // else begin
         begin
             clk_cnt = clk_cnt + 1;
-            if(clk_cnt[32:29]>15)
+            if(clk_cnt[31:28]>15)
                 clk_cnt = 0;
         end
     end
@@ -44,7 +49,8 @@ module wam_m(
     assign clk_19 = clk_cnt[19];
 
     // generate moles
-    wam_gen sub_gen( .clk_19(clk_19), .clr(clr), .clk_cnt(clk_cnt), .hit(hit), .holes(holes) );
+    wam_hrd sub_hrd( .clk(clk), .clr(clr), .lft(lft), .rgt(rgt), .cout0(cout0), .hrdn(hrdn), .age(age), .rto(rto) );
+    wam_gen sub_gen( .clk_19(clk_19), .clr(clr), .clk_cnt(clk_cnt), .hit(hit), .age(age), .rto(rto), .holes(holes) );
     wam_led sub_led( .holes(holes), .ld(ld) );
 
     // handle input tap
@@ -52,8 +58,8 @@ module wam_m(
     wam_hit sub_hit( .clk_19(clk_19), .tap(tap), .holes(holes), .hit(hit) );
 
     // handle score count
-    wam_scr sub_scr( .clk(clk), .clr(clr), .hit(hit), .num(score) );
+    wam_scr sub_scr( .clk(clk), .clr(clr), .hit(hit), .num(score), .cout0(cout0) );
 
     // handle display on digital tube
-    wam_dis sub_dis( .clk_16(clk_16), .score(score), .an(an), .a2g(a2g) );
+    wam_dis sub_dis( .clk_16(clk_16), .hrdn(hrdn), .score(score), .an(an), .a2g(a2g) );
 endmodule

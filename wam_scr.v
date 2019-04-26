@@ -26,15 +26,16 @@ module wam_cnt(             // 1-bit 0-to-9 counter
     end
 endmodule // wam_cnt
 
-module wam_scr(             // switch count
+module wam_scr(             // score count
     input wire clk,         // synchronize clock
     input wire clr,
     input wire [7:0] hit,
-    output reg [11:0] num
+    output reg [11:0] num,
+    output wire cout0
     );
 
     wire [11:0] cnum;       // counter number register
-    wire cout0, cout1, cout2;
+    wire cout1, cout2;
     wire scr;
 
     assign scr = hit[0] | hit[1] | hit[2] | hit[3] | hit[4] | hit[5] | hit[6] | hit[7];

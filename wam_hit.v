@@ -2,7 +2,7 @@ module wam_tap (            // input switch
     input wire clk_19,
     input wire [7:0] sw,
     // output wire [7:0] tap
-    output reg [7:0] tap       // active high
+    output reg [7:0] tap        // active high
     );
 
     reg [7:0]  sw_pre;
