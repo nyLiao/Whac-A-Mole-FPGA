@@ -83,8 +83,8 @@ module wam_hrd (
                 rto <= 61;
             end
             'hA: begin
-                age <= 4'd01;
-                rto <= 200;
+                age <= 4'd02;
+                rto <= 93;
             end
             default: begin
                 age <= 4'b0111;

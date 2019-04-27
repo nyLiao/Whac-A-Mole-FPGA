@@ -12,7 +12,7 @@ module wam_m(
     input wire clr,         // button - clear
     input wire lft,         // button - left
     input wire rgt,         // button - right
-    // input wire pse,         // button - pause
+    input wire pse,         // button - pause
     input wire [7:0] sw,    // switch
     output wire [3:0] an,   // digital tube - analog
     output wire [6:0] a2g,  // digital tube - stroke
@@ -21,7 +21,8 @@ module wam_m(
 
     reg  [31:0] clk_cnt;    // clock count
     wire clk_16;            // clock at 2^16
-    wire clk_19;            // clock at 2^19
+    reg  clk_19;            // clock at 2^19
+    reg  pse_flg;
 
     wire cout0;
     wire [3:0] hrdn;        // hardness of 0~9
@@ -46,7 +47,15 @@ module wam_m(
     end
 
     assign clk_16 = clk_cnt[16];
-    assign clk_19 = clk_cnt[19];
+
+    always @ (posedge pse) begin
+        pse_flg = ~pse_flg;
+    end
+
+    always @ (posedge clk) begin
+        if (!pse_flg)
+            clk_19 = clk_cnt[19];
+    end
 
     // generate moles
     wam_hrd sub_hrd( .clr(clr), .lft(lft), .rgt(rgt), .cout0(cout0), .hrdn(hrdn), .age(age), .rto(rto) );
