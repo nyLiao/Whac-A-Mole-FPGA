@@ -17,7 +17,7 @@ module wam_tap (            // input switch
     always @ (posedge clk_19) begin
         for (i=0; i<8; i=i+1) begin
             if (sw_cnt[4*i+:4] > 0) begin               // filtering
-                if (sw_cnt[4*i+:4] >= 4'b0100) begin    // stable
+                if (sw_cnt[4*i+:4] > 4'b0100) begin     // stable
                     sw_cnt[4*i+:4] <= 4'b0000;
                     tap[i] <= 1;                        // output status
                 end
