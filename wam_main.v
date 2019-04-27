@@ -58,8 +58,8 @@ module wam_m(
     end
 
     // generate moles
-    wam_hrd sub_hrd( .clk_19(clk_19), .clr(clr), .lft(lft), .rgt(rgt), .cout0(cout0), .hrdn(hrdn), .age(age), .rto(rto) );
-    wam_gen sub_gen( .clk_19(clk_19), .clr(clr), .clk_cnt(clk_cnt), .hit(hit), .age(age), .rto(rto), .holes(holes) );
+    wam_hrd sub_hrd( .clk_19(clk_19), .clr(clr), .lft(lft), .rgt(rgt), .cout0(cout0), .hrdn(hrdn) );
+    wam_gen sub_gen( .clk_19(clk_19), .clr(clr), .clk_cnt(clk_cnt), .hit(hit), .hrdn(hrdn), .holes(holes) );
     wam_led sub_led( .holes(holes), .ld(ld) );
 
     // handle input tap

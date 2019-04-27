@@ -1,7 +1,7 @@
 module wam_tch (                // input button
     input wire clk_19,
     input wire btn,
-    output reg tch        // active high
+    output reg tch              // active high
     );
 
     reg  btn_pre;
@@ -13,23 +13,23 @@ module wam_tch (                // input button
     assign btn_edg = (~btn_pre) & (btn);
 
     always @ (posedge clk_19) begin
-            if (btn_cnt > 0) begin               // filtering
-                if (btn_cnt > 4'b0100) begin     // stable
+            if (btn_cnt > 0) begin                  // filtering
+                if (btn_cnt > 4'b0100) begin        // stable
                     btn_cnt <= 4'b0000;
-                    tch <= 1;                        // output status
+                    tch <= 1;                       // output status
                 end
                 else begin
-                    if (btn_edg) begin                // if btnitch then back to idle
+                    if (btn_edg) begin              // if button then back to idle
                         btn_cnt <= 0;
                     end
-                    else begin                          // count
+                    else begin                      // count
                         btn_cnt <= btn_cnt + 1;
                     end
                 end
             end
-            else begin                                  // idle
+            else begin                              // idle
                 tch <= 0;
-                if (btn_edg) begin                    // if btnitch then start filtering
+                if (btn_edg) begin                  // if button then start filtering
                     btn_cnt <= 4'b0001;
                 end
             end
@@ -42,22 +42,21 @@ module wam_hrd (
     input wire lft,
     input wire rgt,
     input wire cout0,
-    output reg [3:0] hrdn,          // hardness of 0~9
-    output reg [3:0] age,
-    output reg [7:0] rto
+    output reg [3:0] hrdn          // hardness of 0~9
     );
 
+    wire lfts;
+    wire rgts;
+    wire cout0s;
+
     wire harder;
-    wire harderr;
     wire easier;
 
-    // assign easier = lft;
-    wam_tch tchl( .clk_19(clk_19), .btn(lft), .tch(easier));
-
-    wam_tch tchr( .clk_19(clk_19), .btn(rgt), .tch(harderr));
-    assign harder = harderr | cout0;
-
-    // reg c0, c1, c2;
+    wam_tch tchl( .clk_19(clk_19), .btn(lft), .tch(lfts));
+    wam_tch tchr( .clk_19(clk_19), .btn(rgt), .tch(rgts));
+    wam_tch tchc( .clk_19(clk_19), .btn(cout0), .tch(cout0s));
+    assign easier = lfts;
+    assign harder = rgts | cout0s;
 
     always @ (posedge clk_19) begin
         if (clr)
@@ -67,37 +66,19 @@ module wam_hrd (
                 hrdn <= hrdn - 1'd1;
             end
         end
-        else if (harder) begin                      // rgt or cout0: harder
+        else if (harder) begin          // rgt or cout0: harder
             if (hrdn < 10) begin
                 hrdn <= hrdn + 1'd1;
             end
         end
     end
+endmodule // wam_hrd
 
-    // always @ ( posedge clr or posedge harder or posedge easier ) begin
-    //     if (clr)
-    //         hrdn = 0;
-    //     else if (easier) begin          // lft: easier
-    //         if (hrdn > 0) begin
-    //             // c0 = (~hrdn[0]) & 1;
-    //             // hrdn[0] = hrdn[0] ^ 1;
-    //             //
-    //             // c1 = (~hrdn[1]&(1^c0))|(1&c0);
-    //             // hrdn[1] = hrdn[1] ^ 1 ^ c0;
-    //             //
-    //             // c2 = (~hrdn[2]&(1^c1))|(1&c1);
-    //             // hrdn[2] = hrdn[2] ^ 1 ^ c1;
-    //             //
-    //             // hrdn[3] = hrdn[3] ^ 1 ^ c2;
-    //             hrdn = hrdn - 4'd1;
-    //         end
-    //     end
-    //     else begin                      // rgt or cout0: harder
-    //         if (hrdn < 10) begin
-    //             hrdn = hrdn + 4'd1;
-    //         end
-    //     end
-    // end
+module wam_par (
+    input wire [3:0] hrdn,
+    output reg [3:0] age,
+    output reg [7:0] rto
+    );
 
     always @ ( * ) begin
         case (hrdn)
@@ -151,13 +132,4 @@ module wam_hrd (
             end
         endcase
     end
-
-endmodule // wam_hrd
-
-// module wam_par (
-//     input wire [3:0] hrdn,          // hardness of 0~9
-//     output reg [3:0] age,
-//     output reg [7:0] rto
-//     );
-//
-// endmodule // wam_par
+endmodule // wam_par

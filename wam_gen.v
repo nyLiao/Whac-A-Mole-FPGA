@@ -26,8 +26,7 @@ module wam_gen (            // control lives of moles
     input wire clr,
     input wire [31:0] clk_cnt,
     input wire [7:0]  hit,
-    input wire [3:0]  age,
-    input wire [7:0]  rto,
+    input wire [3:0]  hrdn,
     output reg [7:0]  holes         // which hole has moles
     );
 
@@ -35,8 +34,14 @@ module wam_gen (            // control lives of moles
     reg  [31:0] holes_cnt;          // counter of roles, 3 bits for each hole on 2^22
     wire [7:0] rnum;                // random number
 
+    wire [3:0] age;
+    wire [7:0] rto;
+
     reg  [2:0] j;                   // select holes in different rounds
     integer i;                      // index for holes in one round
+
+    // get parameters
+    wam_par par( .hrdn(hrdn), .age(age), .rto(rto) );
 
     // make random number
     wam_rdn rdn1( .clk(clk_cnt[21]), .load(clr), .seed(~clk_cnt[7:0]), .num(rnum) );
