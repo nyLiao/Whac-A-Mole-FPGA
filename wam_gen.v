@@ -30,21 +30,21 @@ module wam_gen (            // control lives of moles
     output reg [7:0]  holes         // which hole has moles
     );
 
-    reg  [2:0] clk_22_cnt;          // clk_22 counter, 3 bits on 2^19
+    reg  [2:0]  clk_22_cnt;         // clk_22 counter, 3 bits on 2^19
     reg  [31:0] holes_cnt;          // counter of roles, 3 bits for each hole on 2^22
-    wire [7:0] rnum;                // random number
+    wire [7:0]  rnum;               // random number
 
-    wire [3:0] age;
-    wire [7:0] rto;
+    wire [3:0]  age;                // moles lifelength
+    wire [7:0]  rto;                // moles appearance ratio
 
-    reg  [2:0] j;                   // select holes in different rounds
+    reg  [2:0]  j;                  // select holes in different rounds
     integer i;                      // index for holes in one round
 
     // get parameters
     wam_par par( .hrdn(hrdn), .age(age), .rto(rto) );
 
     // make random number
-    wam_rdn rdn1( .clk(clk_cnt[21]), .load(clr), .seed(~clk_cnt[7:0]), .num(rnum) );
+    wam_rdn rdn( .clk(clk_cnt[21]), .load(clr), .seed(~clk_cnt[7:0]), .num(rnum) );
 
     // 1-phrase stage machine
     always @ ( posedge clk_19 or posedge clr ) begin
@@ -67,17 +67,17 @@ module wam_gen (            // control lives of moles
                 clk_22_cnt <= 3'b000;
                 for (i=0; i<8; i=i+1) begin
                     if (holes[i] > 0) begin                         // already have mole
-                        if ((holes_cnt[4*i+:4] > age) || hit[i]) begin      // count moles' life
+                        if ((holes_cnt[4*i+:4] > age) || hit[i]) begin      // age decide moles' life
                             holes_cnt[4*i+:4] <= 4'b0000;
                             holes[i] <= 0;
                         end
-                        else begin                                  // die
+                        else begin                                  // count moles' life
                             holes_cnt[4*i+:4] <= holes_cnt[4*i+:4] + 1;
                         end
                     end
                     else begin                                      // no mole yet
-                        if (rnum < rto) begin
-                            if (j==i) begin                         // new mole in hole j
+                        if (rnum < rto) begin                       // rto decide new mole or not
+                            if (j==i) begin                         // new mole in random hole j
                                 holes_cnt[4*i+:4] <= 4'b0001;
                                 holes[i] <= 1;
                             end
@@ -85,7 +85,6 @@ module wam_gen (            // control lives of moles
                     end
                 end
                 j <= j + 1;
-                // holes <= rnum1;
             end
         end
     end

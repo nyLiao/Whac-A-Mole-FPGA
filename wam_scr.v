@@ -1,8 +1,8 @@
 module wam_cnt(             // 1-bit 0-to-9 counter
     input wire clr,
     input wire cin,
-    output reg cout,
-    output reg [3:0] num
+    output reg cout,        // carry bit
+    output reg [3:0] num    // DEC number in BCD
     );
 
     always @(posedge cin or posedge clr) begin
@@ -31,11 +31,11 @@ module wam_scr(             // score count
     input wire clr,
     input wire [7:0] hit,
     output reg [11:0] num,
-    output wire cout0
+    output wire cout0       // carry bit on 10s is a hardness control signal
     );
 
     wire [11:0] cnum;       // counter number register
-    wire cout1, cout2;
+    wire cout1, cout2;      // carry bits as trigger of next counter
     wire scr;
 
     assign scr = hit[0] | hit[1] | hit[2] | hit[3] | hit[4] | hit[5] | hit[6] | hit[7];
@@ -45,6 +45,6 @@ module wam_scr(             // score count
     wam_cnt cnt2( .clr(clr), .cin(cout1), .cout(cout2), .num(cnum[11:8]) );
 
     always @(posedge clk) begin
-        num <= cnum;
+        num <= cnum;        // synchronize clock
     end
 endmodule // wam_scr

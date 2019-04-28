@@ -1,0 +1,43 @@
+# PlanAhead Generated physical constraints 
+
+NET "a2g[0]" LOC = M12;
+NET "a2g[1]" LOC = L13;
+NET "a2g[2]" LOC = P12;
+NET "a2g[3]" LOC = N11;
+NET "a2g[4]" LOC = N14;
+NET "a2g[5]" LOC = H12;
+NET "a2g[6]" LOC = L14;
+
+NET "an[3]" LOC = K14;
+NET "an[2]" LOC = M13;
+NET "an[1]" LOC = J12;
+NET "an[0]" LOC = F12;
+
+//NET "sw[0]" LOC = G12;
+NET "sw[0]" LOC = P11;
+NET "sw[1]" LOC = L3;
+NET "sw[2]" LOC = K3;
+NET "sw[3]" LOC = B4;
+NET "sw[4]" LOC = G3;
+NET "sw[5]" LOC = F3;
+NET "sw[6]" LOC = E2;
+NET "sw[7]" LOC = N3;
+
+NET "ld[0]" LOC = M5;
+NET "ld[1]" LOC = M11;
+NET "ld[2]" LOC = P7;
+NET "ld[3]" LOC = P6;
+NET "ld[4]" LOC = N5;
+NET "ld[5]" LOC = N4;
+NET "ld[6]" LOC = P4;
+NET "ld[7]" LOC = G1;
+
+NET "clk" LOC = B8;
+NET "pse" LOC = A7;
+NET "lft" LOC = M4;
+NET "rgt" LOC = C11;
+NET "clr" LOC = G12;
+
+//NET "sw<0>" CLOCK_DEDICATED_ROUTE = FALSE;
+NET "lft" CLOCK_DEDICATED_ROUTE = FALSE;
+NET "rgt" CLOCK_DEDICATED_ROUTE = FALSE;

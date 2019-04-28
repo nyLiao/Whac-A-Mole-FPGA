@@ -1,53 +1,53 @@
-module wam_tch (                // input button
+module wam_tch (            // input button
     input wire clk_19,
     input wire btn,
     output reg tch              // active high
     );
 
-    reg  btn_pre;
-    wire btn_edg;
-    reg  [3:0] btn_cnt;
+    reg  btn_pre;               // button last status
+    wire btn_edg;               // posedge trigger
+    reg  [3:0] btn_cnt;         // counter
 
     always @(posedge clk_19)    // posedge detection
         btn_pre <= btn;
     assign btn_edg = (~btn_pre) & (btn);
 
     always @ (posedge clk_19) begin
-            if (btn_cnt > 0) begin                  // filtering
-                if (btn_cnt > 4'b0100) begin        // stable
-                    btn_cnt <= 4'b0000;
-                    tch <= 1;                       // output status
+        if (btn_cnt > 0) begin                  // filtering
+            if (btn_cnt > 4'b0100) begin        // stable
+                btn_cnt <= 4'b0000;
+                tch <= 1;                       // output status
+            end
+            else begin
+                if (btn_edg) begin              // if button then back to idle
+                    btn_cnt <= 0;
                 end
-                else begin
-                    if (btn_edg) begin              // if button then back to idle
-                        btn_cnt <= 0;
-                    end
-                    else begin                      // count
-                        btn_cnt <= btn_cnt + 1;
-                    end
+                else begin                      // count
+                    btn_cnt <= btn_cnt + 1;
                 end
             end
-            else begin                              // idle
-                tch <= 0;
-                if (btn_edg) begin                  // if button then start filtering
-                    btn_cnt <= 4'b0001;
-                end
+        end
+        else begin                              // idle
+            tch <= 0;
+            if (btn_edg) begin                  // if button pressed then start filtering
+                btn_cnt <= 4'b0001;
             end
+        end
     end
 endmodule // wam_tch
 
-module wam_hrd (
+module wam_hrd (            // hardness control
     input wire clk_19,
     input wire clr,
     input wire lft,
     input wire rgt,
     input wire cout0,
-    output reg [3:0] hrdn          // hardness of 0~9
+    output reg [3:0] hrdn          // hardness of 0~9 or H (hard)
     );
 
-    wire lfts;
-    wire rgts;
-    wire cout0s;
+    wire lfts;      // stable left button
+    wire rgts;      // stable right button
+    wire cout0s;    // shorter carry signal
 
     wire harder;
     wire easier;
@@ -74,7 +74,7 @@ module wam_hrd (
     end
 endmodule // wam_hrd
 
-module wam_par (
+module wam_par (            // decide hardness parameters
     input wire [3:0] hrdn,
     output reg [3:0] age,
     output reg [7:0] rto

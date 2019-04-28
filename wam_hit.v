@@ -1,16 +1,15 @@
 module wam_tap (            // input switch
     input wire clk_19,
     input wire [7:0] sw,
-    // output wire [7:0] tap
-    output reg [7:0] tap        // active high
+    output reg [7:0] tap    // active high
     );
 
-    reg [7:0]  sw_pre;
-    wire [7:0] sw_edg;
-    reg [31:0] sw_cnt;
-    integer i;
+    reg [7:0]  sw_pre;      // last status
+    wire [7:0] sw_edg;      // bilateral edge trigger
+    reg [31:0] sw_cnt;      // state machine counter
+    integer i;              // switch selector
 
-    always @(posedge clk_19)    // edge detection
+    always @(posedge clk_19)    // bilateral edge detection
         sw_pre <= sw;
     assign sw_edg = ((sw_pre) & (~sw)) | ((~sw_pre) & (sw));
 
@@ -38,23 +37,19 @@ module wam_tap (            // input switch
             end
         end
     end
-    // assign tap = sw_edg;
-    // assign tap = sw;
 endmodule // wam_tap
 
 module wam_hit (            // get successful hit condition
     input wire clk_19,
     input wire [7:0] tap,
     input wire [7:0] holes,
-    output reg [7:0] hit         // effective hit
+    output reg [7:0] hit    // effective hit
     );
 
-    reg [7:0] holes_pre;
+    reg [7:0] holes_pre;    // holes last status
 
     always @ (posedge clk_19) begin
-        hit <= tap & holes_pre;
-        holes_pre <= holes;
+        hit <= tap & holes_pre;     // both tap and have mole, then is successful hit
+        holes_pre <= holes;         // save hole status
     end
-    // assign hit = tap & holes_pre;
-    // assign hit = tap;
 endmodule // wam_hit

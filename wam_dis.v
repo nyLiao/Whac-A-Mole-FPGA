@@ -1,5 +1,5 @@
-module wam_led (            // led output
-    input wire [7:0]  holes,
+module wam_led (            // LED output
+    input  wire [7:0] holes,
     output wire [7:0] ld
     );
 
@@ -34,16 +34,52 @@ module wam_obd(             // 1-bit digital tube output
     end
 endmodule // wam_obd
 
-module wam_dis(             // handle digital tube output
-    input clk_16,
-    input wire [3:0] hrdn,
-    input wire [11:0] score,
-    output reg [3:0] an,
-    output wire [6:0] a2g
+module wam_lst (            // digital first bit (hardness bit) flashing for tap or hardness change
+    input wire clk_19,
+    input wire [7:0] tap,
+    input wire lft,
+    input wire rgt,
+    input wire cout0,
+    output reg lstn
     );
 
-    reg [1:0] clk_16_cnt;
-    reg [3:0] dnum;
+    reg  [3:0] cnt;     // counter
+    wire trg;           // trigger signal
+    wire cout0s;        // cout0 signal conveter
+
+    wam_tch tchc( .clk_19(clk_19), .btn(cout0), .tch(cout0s));
+    assign trg = tap[0] | tap[1] | tap[2] | tap[3] | tap[4] | tap[5] | tap[6] | tap[7] | lft | rgt | cout0s;
+
+    always @ (posedge clk_19) begin
+        if (cnt > 0) begin                  // lasting
+            if (cnt > 4'b0100) begin        // long enough
+                cnt <= 4'b0000;
+                lstn <= 0;                  // dim
+            end
+            else begin
+                cnt <= cnt + 1;
+            end
+        end
+        else begin                          // idle
+            if (trg) begin                  // if trigger then light up
+                cnt <= 4'b0001;
+                lstn <= 1;
+            end
+        end
+    end
+endmodule // wam_lst
+
+module wam_dis(             // handle digital tube output
+    input clk_16,
+    input wire  [3:0]  hrdn,
+    input wire  [11:0] score,
+    input wire  lstn,
+    output reg  [3:0]  an,
+    output wire [6:0]  a2g
+    );
+
+    reg [1:0] clk_16_cnt;   // counter
+    reg [3:0] dnum;         // displaying number
 
     always @ (posedge clk_16) begin
         clk_16_cnt <= clk_16_cnt + 1;
@@ -64,8 +100,11 @@ module wam_dis(             // handle digital tube output
                 an = 4'b1011;
             end
             2'b11: begin
-                dnum = hrdn; //4'hB;
-                an = 4'b0111;
+                dnum = hrdn;
+                if (lstn)
+                    an = 4'b0111;
+                else
+                    an = 4'b1111;
             end
         endcase
     end
