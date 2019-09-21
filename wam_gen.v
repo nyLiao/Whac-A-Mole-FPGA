@@ -1,3 +1,7 @@
+// Moles generator
+//
+// by nyLiao, April, 2019
+
 module wam_rdn(             // generate 8-bit random number
     input wire clk,
     input wire load,

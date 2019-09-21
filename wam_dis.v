@@ -1,3 +1,7 @@
+// LED and digital tube display
+//
+// by nyLiao, April, 2019
+
 module wam_led (            // LED output
     input  wire [7:0] holes,
     output wire [7:0] ld

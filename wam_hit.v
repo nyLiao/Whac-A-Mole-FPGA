@@ -1,3 +1,7 @@
+// Switch input and hit control
+//
+// by nyLiao, April, 2019
+
 module wam_tap (            // input switch
     input wire clk_19,
     input wire [7:0] sw,

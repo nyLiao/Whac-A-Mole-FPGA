@@ -7,6 +7,8 @@
 //  Display hardness and score on digital tubes
 //  Control game (pause/start, easier, harder, start/restart) by buttons
 //
+//  by nyLiao, April, 2019
+//
 // structure:
 //      instance - module  (file)
 //  wam_m (wam_main.v)                   // main module

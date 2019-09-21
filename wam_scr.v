@@ -1,3 +1,7 @@
+// Score count
+//
+// by nyLiao, April, 2019
+
 module wam_cnt(             // 1-bit 0-to-9 counter
     input wire clr,
     input wire cin,

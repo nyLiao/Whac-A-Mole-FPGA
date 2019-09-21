@@ -1,3 +1,7 @@
+// Hardness control
+//
+// by nyLiao, April, 2019
+
 module wam_tch (            // input button
     input wire clk_19,
     input wire btn,
